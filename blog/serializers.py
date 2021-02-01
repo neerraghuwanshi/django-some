@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import blog
+from .models import blog, Comment
 from UserProfile.models import UserProfile
 
 
@@ -16,7 +16,7 @@ class blogSerializer(serializers.ModelSerializer):
             'author',
             'likes',
             'is_liked',
-            'image',
+            'media',
             'created',
             'updated_at',
             'author_image'
@@ -37,8 +37,29 @@ class blogSerializer(serializers.ModelSerializer):
     
     def get_author_image(self, obj):
         request = self.context.get("request")
-        image = UserProfile.objects.filter(user__username=obj.author)
-        if image[0].image:
-            return request.build_absolute_uri(image[0].image.url)
+        profile = UserProfile.objects.get(user__username=obj.author)
+        if profile.image:
+            return request.build_absolute_uri(profile.image.url)
 
     
+class CommentSerializer(serializers.ModelSerializer):
+    commentor = serializers.SerializerMethodField(read_only=True)
+    commentor_image = serializers.SerializerMethodField(read_only=True)
+    
+    class Meta:
+        model = Comment
+        fields = [
+            'id',
+            'comment',
+            'commentor',
+            'commentor_image',
+        ]
+        
+    def get_commentor(self, obj):
+        return obj.commentor.username
+    
+    def get_commentor_image(self, obj):
+        request = self.context.get("request")
+        profile = UserProfile.objects.get(user__username=obj.commentor)
+        if profile.image:
+            return request.build_absolute_uri(profile.image.url)

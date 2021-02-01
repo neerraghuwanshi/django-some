@@ -15,12 +15,13 @@ User = get_user_model()
 
 def get_messages(chatId, messageIndex):
     chat = get_object_or_404(Chat, id=chatId)
-    return chat.messages.order_by('-timestamp').all()[messageIndex:messageIndex+21]
+    return chat.messages.order_by('-timestamp').all()[messageIndex:messageIndex+20]
 
 
 def get_chats(username, chatIndex):
     chats = Chat.objects.filter(participants__username=username)
-    return chats[chatIndex:chatIndex+21]
+    return chats
+    # return chats[chatIndex:chatIndex+20]
 
 
 def get_user_contact(username):
@@ -64,6 +65,3 @@ class ChatDeleteView(DestroyAPIView):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
     permission_classes = (permissions.IsAuthenticated, )
-
-
-

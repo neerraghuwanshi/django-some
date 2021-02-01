@@ -11,7 +11,7 @@ class UserProfile(models.Model):
     followers = models.ManyToManyField(User,related_name='following',blank=True)
     following = models.ManyToManyField(User,related_name='followers',blank=True)
     bio = models.TextField(blank=True, null=True)
-    image=models.ImageField(blank=True,null=True,upload_to="profile_images/")
+    image = models.ImageField(blank=True,null=True,upload_to="profile_images/")
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 

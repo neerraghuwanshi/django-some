@@ -43,15 +43,3 @@ class UserProfileView(RetrieveUpdateDestroyAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
-
-        
-    
-
-          
-        
-               
-                
-
-
-
- 

@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Q
 from UserProfile.models import UserProfile
+from .validators import validate_media
+
 
 # Create your models here.
 
@@ -29,22 +31,37 @@ class TweetManager(models.Manager):
 
     def by_username(self, username):
         return self.get_queryset().by_username(username)
+    
+    
+class Comment(models.Model):
+    id = models.AutoField(primary_key=True)
+    comment = models.CharField(max_length=300)
+    created = models.TimeField(auto_now_add=True)
+    commentor = models.ForeignKey(User, related_name='commentor', on_delete=models.CASCADE)
+    
+    class Meta:
+        ordering = ['-id']
+    
+    def __str__(self):                   
+        return f'{self.id}(id) {self.commentor} -> {self.comment}'
 
 
 class blog(models.Model):
-        id = models.AutoField(primary_key=True)
-        caption = models.CharField(max_length=300, null=True, blank=True)
-        author = models.ForeignKey(User,related_name='blog_author', on_delete=models.CASCADE,null=True)
-        created = models.TimeField(auto_now_add=True)
-        updated_at = models.TimeField(auto_now=True)
-        image = models.ImageField(blank=True, null=True, upload_to='images/')
-        likes = models.ManyToManyField(User,related_name='liking_user',blank=True)
+    id = models.AutoField(primary_key=True)
+    caption = models.CharField(max_length=300, null=True, blank=True)
+    author = models.ForeignKey(User, related_name='blog_author', on_delete=models.CASCADE,null=True)
+    created = models.TimeField(auto_now_add=True)
+    updated_at = models.TimeField(auto_now=True)
+    media = models.FileField(blank=True, null=True, upload_to='media/', validators=(validate_media,))
+    likes = models.ManyToManyField(User,related_name='liking_user',blank=True)
+    comments = models.ManyToManyField(to=Comment, related_name='comments')
 
-        objects = TweetManager()
+    objects = TweetManager()
+    
+    class Meta:
+        ordering = ['-id']
 
-        def __str__(self):
-            if self.caption:                    return self.caption
-            return self.id
-
-
-        
+    def __str__(self):
+        if self.caption:                    
+            return self.caption
+        return str(self.id)

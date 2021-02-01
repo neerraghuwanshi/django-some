@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     'channels_redis',
 
     'User',
-    'payment',
     'blog',
     'UserProfile',
     'chat',
@@ -172,9 +171,9 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 
         'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
-    
+    'PAGE_SIZE': 10,    
 }
+
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
 )

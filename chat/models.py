@@ -6,8 +6,7 @@ User = get_user_model()
 
 
 class Message(models.Model):
-    contact = models.ForeignKey(
-        User, related_name='messages', on_delete=models.CASCADE)
+    contact = models.ForeignKey(User, related_name='messages', on_delete=models.CASCADE)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -18,9 +17,10 @@ class Message(models.Model):
 
 class Chat(models.Model):
     participants = models.ManyToManyField(
-        User, related_name='chats', blank=True)
-    messages = models.ManyToManyField(Message, blank=True)
+        User, related_name='chats')
+    messages = models.ManyToManyField(Message)
     updated_at = models.DateTimeField(auto_now=True)
+    visited = models.ManyToManyField(User, related_name='visited')
 
     class Meta:
         ordering = ['-updated_at']

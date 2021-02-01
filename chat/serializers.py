@@ -22,7 +22,7 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ('id', 'messages', 'participants','user_image')
+        fields = ('id', 'participants', 'user_image')
         read_only = ('id')
 
     def get_user_image(self, obj):
@@ -31,8 +31,9 @@ class ChatSerializer(serializers.ModelSerializer):
         for participant in participants:
             if participant != request.user.username:
                 contact = get_user_contact(participant)
+                break
         image = UserProfile.objects.get(user=contact)
-        if image.image:
+        if image and image.image:
             return request.build_absolute_uri(image.image.url)
 
     def create(self, validated_data):
@@ -44,6 +45,6 @@ class ChatSerializer(serializers.ModelSerializer):
         new_chat.save()
         for username in participants:
             contact = get_user_contact(username)
-            new_chat.add(contact)
+            new_chat.participants.add(contact)
         new_chat.save()
-        return chat
+        return new_chat

@@ -13,10 +13,13 @@ class ChatConsumer(WebsocketConsumer):
 
     def fetch_messages(self, data):
         messages = get_messages(data['chatId'], data['messageIndex'])
+        user_contact = get_user_contact(data['username'])
+        current_chat = get_current_chat(data['chatId'])
+        current_chat.visited.add(user_contact)
         content = {
             'command': 'messages',
             'messages': self.messages_to_json(messages)
-            }
+        }
         self.send_message(content)
 
     def fetch_more_messages(self, data):
@@ -33,12 +36,21 @@ class ChatConsumer(WebsocketConsumer):
         content=data['message'])
         current_chat = get_current_chat(data['chatId'])
         current_chat.messages.add(message)
+        current_chat.participants.all()
+        current_chat.visited.clear()
+        current_chat.visited.add(user_contact)
         current_chat.save()
         content = {
             'command': 'new_message',
             'message': self.message_to_json(message)
         }
         return self.send_chat_message(content)
+    
+    def fetched_message(self, data):
+        user_contact = get_user_contact(data['username'])
+        current_chat = get_current_chat(data['chatId'])
+        current_chat.visited.add(user_contact)
+        self.send_chat_message('fetched')
 
     def messages_to_json(self, messages):
         result = []
@@ -57,7 +69,8 @@ class ChatConsumer(WebsocketConsumer):
     commands = {
         'fetch_messages': fetch_messages,
         'new_message': new_message,
-        'fetch_more_messages':fetch_more_messages
+        'fetch_more_messages': fetch_more_messages,
+        'fetched_message': fetched_message,
     }
 
     def connect(self):
